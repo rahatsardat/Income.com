@@ -1,0 +1,154 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Income.com | Earn Online</title>
+  <style>
+    body { font-family: sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+    .container { max-width: 480px; margin: auto; background: white; padding: 20px; box-shadow: 0 0 8px rgba(0,0,0,0.1); }
+    h1, h2, h3 { text-align: center; }
+    button, input { width: 100%; padding: 10px; margin-top: 10px; border: 1px solid #ddd; border-radius: 5px; }
+    .menu { display: flex; justify-content: space-between; margin-top: 20px; gap: 5px; }
+    .menu button { flex: 1; }
+    .back-btn { color: blue; text-decoration: underline; cursor: pointer; margin-top: 10px; display: block; text-align: center; }
+    .hidden { display: none; }
+    .transection-item { font-size: 14px; border-bottom: 1px solid #eee; padding: 5px 0; }
+    img.banner { width: 100%; border-radius: 10px; margin-bottom: 15px; }
+    label { margin-top: 10px; display: block; font-weight: bold; }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div id="signup">
+    <h1>Welcome to Income.com</h1>
+    <img src="https://oaidalleapiprodscus.blob.core.windows.net/private/org-LXcEPCbkMEGJP6RlZzzR63oP/user-yR0t3LfuSfYu3fDLdmpTaFRO/img-e13db7267059490f98f4b45f6597c2ab.png" alt="income banner" class="banner" />
+    <input type="text" placeholder="Username" id="user" />
+    <input type="password" placeholder="Password" id="pass" />
+    <button onclick="goDashboard()">Sign Up</button>
+  </div>
+
+  <div id="dashboard" class="hidden">
+    <h2>Dashboard</h2>
+    <div><strong>Balance:</strong> <span id="balance">৳0</span></div>
+    <div><strong>Your Referral Link:</strong> <p id="referralLink"></p></div>
+    <div class="menu">
+      <button onclick="openSection('earn')">Earn</button>
+      <button onclick="openSection('level')">Level</button>
+      <button onclick="openSection('settings')">Settings</button>
+      <button onclick="openSection('history')">History</button>
+    </div>
+  </div>
+
+  <div id="earn" class="hidden">
+    <h2>Earn Money</h2>
+    <button onclick="watchAds()">Watch Ads (৳3)</button>
+    <button onclick="signupEarn()">Referral Bonus (৳50)</button>
+    <p class="back-btn" onclick="goBack()">Back to Dashboard</p>
+  </div>
+
+  <div id="level" class="hidden">
+    <h2>Level Info</h2>
+    <p>Total 21 levels. Reach level 21 with 45 referrals. Then each referral earns ৳50.</p>
+    <p class="back-btn" onclick="goBack()">Back to Dashboard</p>
+  </div>
+
+  <div id="settings" class="hidden">
+    <h2>Settings</h2>
+    <p><strong>Withdraw via Bkash/Nagad:</strong> Minimum ৳6000 & 30 referrals required.</p>
+    <p><strong>Update Profile:</strong> Upload photo, edit name & email.</p>
+    <h3>Submit Payment Info</h3>
+    <form id="paymentForm" onsubmit="submitPayment(event)">
+      <label for="bkash">Bkash Number:</label>
+      <input type="text" id="bkash" name="bkash" placeholder="01XXXXXXXXX" />
+      <label for="nagad">Nagad Number:</label>
+      <input type="text" id="nagad" name="nagad" placeholder="01XXXXXXXXX" />
+      <button type="submit">Submit</button>
+    </form>
+    <p id="paymentMessage" style="color: green; text-align: center;"></p>
+    <p class="back-btn" onclick="goBack()">Back to Dashboard</p>
+  </div>
+
+  <div id="history" class="hidden">
+    <h2>Income History</h2>
+    <p>Today: ৳<span id="todayIncome">0</span></p>
+    <p>Last 7 Days: ৳<span id="weekIncome">0</span></p>
+    <p>Last 30 Days: ৳<span id="monthIncome">0</span></p>
+    <p class="back-btn" onclick="goBack()">Back to Dashboard</p>
+  </div>
+</div>
+
+<script>
+  let balance = 0;
+  let referralBonus = false;
+
+  function goDashboard() {
+    const user = document.getElementById("user").value;
+    if (!user) {
+      alert("Enter username");
+      return;
+    }
+    document.getElementById("signup").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+    const link = window.location.origin + "?ref=" + encodeURIComponent(user);
+    document.getElementById("referralLink").innerText = link;
+  }
+
+  function openSection(id) {
+    document.getElementById("dashboard").classList.add("hidden");
+    document.getElementById(id).classList.remove("hidden");
+  }
+
+  function goBack() {
+    ["earn", "level", "settings", "history"].forEach(id =>
+      document.getElementById(id).classList.add("hidden")
+    );
+    document.getElementById("dashboard").classList.remove("hidden");
+  }
+
+  function watchAds() {
+    balance += 3;
+    updateBalance();
+  }
+
+  function signupEarn() {
+    if (!referralBonus) {
+      balance += 50;
+      referralBonus = true;
+      updateBalance();
+      alert("Referral bonus added!");
+    } else {
+      alert("You already claimed referral bonus.");
+    }
+  }
+
+  function updateBalance() {
+    document.getElementById("balance").innerText = "৳" + balance;
+    document.getElementById("todayIncome").innerText = balance;
+    document.getElementById("weekIncome").innerText = balance;
+    document.getElementById("monthIncome").innerText = balance;
+  }
+
+  function submitPayment(event) {
+    event.preventDefault();
+    const bkash = document.getElementById("bkash").value;
+    const nagad = document.getElementById("nagad").value;
+    const msg = document.getElementById("paymentMessage");
+    if (bkash || nagad) {
+      msg.innerText = "Payment info submitted!";
+    } else {
+      msg.innerText = "Please enter at least one number.";
+    }
+  }
+
+  window.onload = function () {
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref) {
+      localStorage.setItem("referredBy", ref);
+    }
+  };
+</script>
+</body>
+</html>
